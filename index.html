@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cauan de Pádua</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Spectral+SC:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f1eb;
+    --ink: #1a1814;
+    --ink-mid: #4a453d;
+    --ink-faint: #9a9288;
+    --rule: rgba(26,24,20,0.12);
+    --rule-strong: rgba(26,24,20,0.28);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0e0c;
+      --ink: #e8e2d6;
+      --ink-mid: #a09890;
+      --ink-faint: #5a5450;
+      --rule: rgba(232,226,214,0.1);
+      --rule-strong: rgba(232,226,214,0.22);
+    }
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'EB Garamond', serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+  }
+
+  .bg-geo {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .rule-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: fade 1s ease forwards 0.1s;
+  }
+
+  .rule-thick { width: 100%; height: 2px; background: var(--ink); }
+  .rule-thin  { width: 100%; height: 0.5px; background: var(--rule-strong); }
+
+  .header {
+    margin-bottom: 36px;
+    opacity: 0;
+    animation: fade 1s ease forwards 0.3s;
+  }
+
+  .category-label {
+    font-family: 'Spectral SC', serif;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .category-label::before,
+  .category-label::after {
+    content: '';
+    flex: 1;
+    height: 0.5px;
+    background: var(--rule);
+  }
+
+  h1 {
+    font-family: 'Spectral SC', serif;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    font-weight: 400;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+    color: var(--ink);
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    font-style: italic;
+    color: var(--ink-mid);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .mid-rule {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fade 1s ease forwards 0.5s;
+  }
+
+  .mid-rule-line { flex: 1; height: 0.5px; background: var(--rule-strong); }
+  .mid-rule-glyph {
+    font-family: 'EB Garamond', serif;
+    font-size: 18px;
+    color: var(--ink-mid);
+    line-height: 1;
+  }
+
+  .links { display: flex; flex-direction: column; width: 100%; }
+
+  .link-entry {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-top: 0.5px solid var(--rule);
+    text-decoration: none;
+    color: var(--ink);
+    padding: 16px 0;
+    transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: fade 0.8s ease forwards;
+  }
+
+  .link-entry:last-child { border-bottom: 0.5px solid var(--rule); }
+
+  .link-entry::before {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0; bottom: 0;
+    width: 100%;
+    background: var(--rule);
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .link-entry:hover::before { left: 0; }
+  .link-entry:hover { padding-left: 8px; }
+
+  .link-number {
+    font-family: 'Spectral SC', serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--ink-faint);
+    letter-spacing: 2px;
+    min-width: 36px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .link-body {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .link-title {
+    font-family: 'Spectral SC', serif;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    margin-bottom: 3px;
+    display: block;
+  }
+
+  .link-desc {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--ink-mid);
+    display: block;
+    line-height: 1.4;
+  }
+
+  .link-arrow {
+    font-size: 14px;
+    color: var(--ink-faint);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s, color 0.3s;
+    margin-left: 12px;
+  }
+
+  .link-entry:hover .link-arrow { transform: translateX(4px); color: var(--ink); }
+
+  .link-entry:nth-child(1) { animation-delay: 0.70s; }
+  .link-entry:nth-child(2) { animation-delay: 0.85s; }
+  .link-entry:nth-child(3) { animation-delay: 1.00s; }
+  .link-entry:nth-child(4) { animation-delay: 1.15s; }
+  .link-entry:nth-child(5) { animation-delay: 1.30s; }
+  .link-entry:nth-child(6) { animation-delay: 1.45s; }
+  .link-entry:nth-child(7) { animation-delay: 1.60s; }
+  .link-entry:nth-child(8) { animation-delay: 1.75s; }
+
+  .footer-rule {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 32px;
+    opacity: 0;
+    animation: fade 1s ease forwards 1.4s;
+  }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-geo">
+  <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <style>
+      .geo { fill: none; stroke: #1a1814; opacity: 0.045; }
+      @media (prefers-color-scheme: dark) { .geo { stroke: #e8e2d6; opacity: 0.07; } }
+    </style>
+    <circle class="geo" cx="500" cy="500" r="480" stroke-width="0.5"/>
+    <circle class="geo" cx="500" cy="500" r="360" stroke-width="0.5"/>
+    <circle class="geo" cx="500" cy="500" r="240" stroke-width="0.5"/>
+    <circle class="geo" cx="500" cy="500" r="120" stroke-width="0.5"/>
+    <line class="geo" x1="0" y1="0" x2="1000" y2="1000" stroke-width="0.4"/>
+    <line class="geo" x1="1000" y1="0" x2="0" y2="1000" stroke-width="0.4"/>
+    <line class="geo" x1="500" y1="0" x2="500" y2="1000" stroke-width="0.4"/>
+    <line class="geo" x1="0" y1="500" x2="1000" y2="500" stroke-width="0.4"/>
+    <rect class="geo" x="146" y="146" width="708" height="708" stroke-width="0.4" transform="rotate(45 500 500)"/>
+    <rect class="geo" x="40" y="40" width="60" height="60" stroke-width="0.5"/>
+    <rect class="geo" x="900" y="40" width="60" height="60" stroke-width="0.5"/>
+    <rect class="geo" x="40" y="900" width="60" height="60" stroke-width="0.5"/>
+    <rect class="geo" x="900" y="900" width="60" height="60" stroke-width="0.5"/>
+    <polygon class="geo" points="500,20 980,500 500,980 20,500" stroke-width="0.4"/>
+  </svg>
+</div>
+
+<div class="page">
+
+  <div class="rule-group">
+    <div class="rule-thick"></div>
+    <div class="rule-thin"></div>
+  </div>
+
+  <div class="header">
+    <div class="category-label">Índice</div>
+    <h1>Cauan de Pádua</h1>
+
+  </div>
+
+  <div class="mid-rule">
+    <div class="mid-rule-line"></div>
+    <span class="mid-rule-glyph">§</span>
+    <div class="mid-rule-line"></div>
+  </div>
+
+  <nav class="links">
+
+    <a class="link-entry" href="https://cauandepadua-files.github.io/uma/" target="_blank" rel="noopener">
+      <span class="link-number">I</span>
+      <span class="link-body">
+        <span class="link-title">Garotos Cavalo</span>
+        <span class="link-desc">Time esportivo</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-entry" href="https://cauandepadua-files.github.io/terreiro/" target="_blank" rel="noopener">
+      <span class="link-number">II</span>
+      <span class="link-body">
+        <span class="link-title">Terreiro</span>
+        <span class="link-desc">Pai de santo</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-entry" href="https://cauandepadua-files.github.io/palestina/" target="_blank" rel="noopener">
+      <span class="link-number">III</span>
+      <span class="link-body">
+        <span class="link-title">Palestina e Irã</span>
+        <span class="link-desc">Apoio e solidariedade</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-entry" href="https://cauandepadua-files.github.io/horizontes/" target="_blank" rel="noopener">
+      <span class="link-number">IV</span>
+      <span class="link-body">
+        <span class="link-title">Minecraft: Horizontes</span>
+        <span class="link-desc">Convite especial</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-entry" href="https://cauandepadua-files.github.io/mares/" target="_blank" rel="noopener">
+      <span class="link-number">V</span>
+      <span class="link-body">
+        <span class="link-title">Torena-san</span>
+        <span class="link-desc">Treinamento de Padua</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-entry" href="https://cauandepadua-files.github.io/umbral/" target="_blank" rel="noopener">
+      <span class="link-number">VI</span>
+      <span class="link-body">
+        <span class="link-title">Umbral</span>
+        <span class="link-desc">Leite de boi</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-entry" href="https://cauandepadua-files.github.io/nomoresesi/" target="_blank" rel="noopener">
+      <span class="link-number">VII</span>
+      <span class="link-body">
+        <span class="link-title">Anti-Sesi</span>
+        <span class="link-desc">No more sesi</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-entry" href="https://soundcloud.com/roblox-terrablade" target="_blank" rel="noopener">
+      <span class="link-number">VIII</span>
+      <span class="link-body">
+        <span class="link-title">Músicas</span>
+        <span class="link-desc">Cauan de Padua meu amor</span>
+      </span>
+      <span class="link-arrow">→</span>
+    </a>
+
+  </nav>
+
+  <div class="footer-rule">
+    <div class="rule-thin"></div>
+    <div class="rule-thick"></div>
+  </div>
+
+
+
+</div>
+
+</body>
+</html>
